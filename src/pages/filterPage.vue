@@ -1,28 +1,3 @@
-<script setup>
-import { ref, computed } from "vue";
-
-const products = ref([
-  { id: 1, name: "Paracetamol", category: "Medicine" },
-  { id: 7, name: "Moisturizing Cream", category: "Skincare" },
-  { id: 2, name: "Vitamin C", category: "Supplement" },
-  { id: 3, name: "Toothpaste", category: "Hygiene" },
-  { id: 5, name: "Face Mask", category: "Skincare" },
-  { id: 6, name: "Hand Sanitizer", category: "Hygiene" },
-  { id: 8, name: "Sunscreen", category: "Skincare" },
-  { id: 15, name: "Shampoo", category: "Hair Care" },
-]);
-
-
-const searchQuery = ref("");
-
-const filteredProducts = computed(() => {
-  const query = searchQuery.value.trim().toLowerCase();
-  return query
-    ? products.value.filter((p) => p.name.toLowerCase().includes(query))
-    : products.value;
-});
-</script>
-
 <template>
   <div class="bg-gradient-to-r from-purple-200 to-purple-300 p-8 min-h-screen">
     <div class="bg-white shadow-lg mx-auto p-8 rounded-2xl max-w-3xl">
@@ -57,3 +32,21 @@ const filteredProducts = computed(() => {
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref } from "vue";
+import { useFilter } from "../composables/useFilter";
+
+const products = ref([
+  { id: 1, name: "Paracetamol", category: "Medicine" },
+  { id: 7, name: "Moisturizing Cream", category: "Skincare" },
+  { id: 2, name: "Vitamin C", category: "Supplement" },
+  { id: 3, name: "Toothpaste", category: "Hygiene" },
+  { id: 5, name: "Face Mask", category: "Skincare" },
+  { id: 6, name: "Hand Sanitizer", category: "Hygiene" },
+  { id: 8, name: "Sunscreen", category: "Skincare" },
+  { id: 15, name: "Shampoo", category: "Hair Care" },
+]);
+
+const { searchQuery, filteredItems: filteredProducts } = useFilter(products);
+</script>
