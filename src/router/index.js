@@ -6,6 +6,7 @@ import Filter from "../pages/filterPage.vue";
 import Users from "../pages/UsersPage.vue";
 import about from "../pages/About.vue";
 import counter from "../pages/counterPage.vue";
+import prods from "../pages/ProductsPage.vue";
 
 const routes = [
   { path: "/", name: "Home", component: HomePage },
@@ -15,6 +16,7 @@ const routes = [
   { path: "/users", name: "Users", component: Users },
   { path: "/about", name: "about", component: about },
   { path: "/counter", name: "counter", component: counter },
+  { path: "/prods", name: "prods", component: prods },
 ];
 
 const router = createRouter({
