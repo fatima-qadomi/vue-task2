@@ -1,7 +1,7 @@
 <template>
   <div
     v-show="visible"
-    class="z-50 fixed inset-0 flex justify-center items-center bg-pink-100 bg-opacity-50"
+    class="z-50 fixed inset-0 flex justify-center items-center bg-white bg-opacity-50"
     @click.self="close"
   >
     <div
@@ -10,7 +10,7 @@
       role="dialog"
       aria-modal="true"
       :aria-label="ariaLabel"
-      class="relative bg-white dark:bg-pink-200 shadow-xl p-6 rounded-2xl focus:outline-none w-11/12 max-w-lg max-h-[90vh] overflow-auto"
+      class="relative bg-white dark:bg-gray-100 shadow-xl p-6 rounded-2xl focus:outline-none w-11/12 max-w-lg max-h-[90vh] overflow-auto"
     >
       <button
         @click="close"

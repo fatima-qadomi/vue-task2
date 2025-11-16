@@ -1,7 +1,8 @@
 <script setup>
 import { ref, computed } from "vue";
+import axios from "axios";
 
-const isLogin = ref(false); 
+const isLogin = ref(false);
 
 const name = ref("");
 const email = ref("");
@@ -9,6 +10,7 @@ const password = ref("");
 const touched = ref({ name: false, email: false, password: false });
 const submitMessage = ref("");
 const loading = ref(false);
+const API_URL = "http://localhost:3000/users";
 
 function markTouched(field) {
   touched.value[field] = true;
@@ -32,11 +34,16 @@ const passwordError = computed(() =>
     : ""
 );
 
-function handleSubmit() {
+async function handleSubmit() {
   touched.value = { name: true, email: true, password: true };
+  submitMessage.value = "";
 
-  if (!isLogin.value && (nameError.value || emailError.value || passwordError.value)) {
-    submitMessage.value = "⚠️ Please fix the highlighted errors before continuing.";
+  if (
+    !isLogin.value &&
+    (nameError.value || emailError.value || passwordError.value)
+  ) {
+    submitMessage.value =
+      "⚠️ Please fix the highlighted errors before continuing.";
     return;
   }
 
@@ -47,21 +54,46 @@ function handleSubmit() {
 
   loading.value = true;
 
-  setTimeout(() => {
-    loading.value = false;
-    submitMessage.value = isLogin.value
-      ? `👋 Welcome back, ${email.value.trim()}!`
-      : `✅ Success! Welcome, ${name.value.trim()} 🎉`;
+  try {
+    if (isLogin.value) {
+      const { data } = await axios.get(API_URL, {
+        params: {
+          email: email.value.trim(),
+          password: password.value.trim(),
+        },
+      });
+
+      if (data.length > 0) {
+        submitMessage.value = `👋 Welcome back, ${
+          data[0].name || data[0].email
+        }!`;
+      } else {
+        submitMessage.value = "❌ Invalid email or password.";
+      }
+    } else {
+      const response = await axios.post(API_URL, {
+        name: name.value.trim(),
+        email: email.value.trim(),
+        password: password.value.trim(),
+      });
+      submitMessage.value = `✅ Success! Welcome, ${response.data.name} 🎉`;
+    }
 
     name.value = "";
     email.value = "";
     password.value = "";
     touched.value = { name: false, email: false, password: false };
-
+  } catch (error) {
+    console.error(error);
+    submitMessage.value =
+      error.response?.data?.message ||
+      "❌ Something went wrong. Please try again.";
+  } finally {
+    loading.value = false;
     setTimeout(() => {
       submitMessage.value = "";
     }, 4000);
-  }, 1500);
+  }
 }
 
 function toggleForm() {
@@ -73,7 +105,9 @@ function toggleForm() {
 </script>
 
 <template>
-  <div class="flex md:flex-row flex-col bg-gradient-to-r from-purple-200 to-purple-300 min-h-screen">
+  <div
+    class="flex md:flex-row flex-col bg-gradient-to-r from-purple-200 to-purple-300 min-h-screen"
+  >
     <div class="hidden md:flex justify-center items-center p-10 md:w-1/2">
       <img
         src="../assets/imgs/img01.png"
@@ -100,17 +134,25 @@ function toggleForm() {
         <p
           v-if="submitMessage"
           class="mb-4 font-medium text-center"
-          :class="submitMessage.includes('Success') || submitMessage.includes('Welcome')
+          :class="
+            submitMessage.includes('Success') ||
+            submitMessage.includes('Welcome')
               ? 'text-green-600'
-              : 'text-red-600'"
+              : 'text-red-600'
+          "
         >
           {{ submitMessage }}
         </p>
 
         <transition name="fade" mode="out-in">
-          <form :key="isLogin ? 'login' : 'signup'" @submit.prevent="handleSubmit">
+          <form
+            :key="isLogin ? 'login' : 'signup'"
+            @submit.prevent="handleSubmit"
+          >
             <div v-if="!isLogin" class="mb-4">
-              <label class="block mb-1 font-medium text-purple-900">Full Name</label>
+              <label class="block mb-1 font-medium text-purple-900"
+                >Full Name</label
+              >
               <input
                 v-model="name"
                 @blur="markTouched('name')"
@@ -119,11 +161,15 @@ function toggleForm() {
                 class="px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-900 w-full transition"
                 :class="nameError ? 'border-red-300' : 'border-gray-200'"
               />
-              <p v-if="nameError" class="mt-2 text-red-600 text-sm">{{ nameError }}</p>
+              <p v-if="nameError" class="mt-2 text-red-600 text-sm">
+                {{ nameError }}
+              </p>
             </div>
 
             <div class="mb-4">
-              <label class="block mb-1 font-medium text-purple-900">Email</label>
+              <label class="block mb-1 font-medium text-purple-900"
+                >Email</label
+              >
               <input
                 v-model="email"
                 @blur="markTouched('email')"
@@ -132,11 +178,15 @@ function toggleForm() {
                 class="px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-900 w-full transition"
                 :class="emailError ? 'border-red-300' : 'border-gray-200'"
               />
-              <p v-if="emailError" class="mt-2 text-red-600 text-sm">{{ emailError }}</p>
+              <p v-if="emailError" class="mt-2 text-red-600 text-sm">
+                {{ emailError }}
+              </p>
             </div>
 
             <div class="mb-6">
-              <label class="block mb-1 font-medium text-purple-900">Password</label>
+              <label class="block mb-1 font-medium text-purple-900"
+                >Password</label
+              >
               <input
                 v-model="password"
                 @blur="markTouched('password')"
@@ -145,7 +195,9 @@ function toggleForm() {
                 class="px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-900 w-full transition"
                 :class="passwordError ? 'border-red-300' : 'border-gray-200'"
               />
-              <p v-if="passwordError" class="mt-2 text-red-600 text-sm">{{ passwordError }}</p>
+              <p v-if="passwordError" class="mt-2 text-red-600 text-sm">
+                {{ passwordError }}
+              </p>
             </div>
 
             <button
