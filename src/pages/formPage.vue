@@ -1,6 +1,11 @@
 <script setup>
 import { ref, computed } from "vue";
 import axios from "axios";
+import { useAuthStore } from "../stores/auth";
+import { useRouter } from "vue-router";
+
+const authStore = useAuthStore();
+const router = useRouter();
 
 const isLogin = ref(false);
 
@@ -25,7 +30,7 @@ const nameError = computed(() =>
 const emailError = computed(() => {
   if (!touched.value.email) return "";
   const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value);
-  return valid ? "" : "Please enter a valid email";
+  return valid ? "" : "Please enter a vaild email";
 });
 
 const passwordError = computed(() =>
@@ -67,6 +72,12 @@ async function handleSubmit() {
         submitMessage.value = `👋 Welcome back, ${
           data[0].name || data[0].email
         }!`;
+
+        authStore.login(data[0]);
+
+        setTimeout(() => {
+          router.push("/prods");
+        }, 800);
       } else {
         submitMessage.value = "❌ Invalid email or password.";
       }

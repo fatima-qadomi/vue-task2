@@ -11,7 +11,7 @@
     <p class="mb-4 font-medium text-rose-500">${{ price.toFixed(2) }}</p>
 
     <button
-      @click="$emit('buy', { title, price })"
+      @click="$emit('buy', { title, price, image })"
       class="bg-gradient-to-r from-rose-400 hover:from-rose-500 to-pink-400 hover:to-pink-500 px-6 py-2 rounded-full text-white transition"
     >
       Buy Now
